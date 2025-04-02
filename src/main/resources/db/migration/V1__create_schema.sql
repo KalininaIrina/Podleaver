@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS transaction (
     account_id INT NOT NULL,
     amount DECIMAL(15,2) NOT NULL,
     timestamp DATE NOT NULL,
-    category_id INT,  -- Сделаем nullable для возможности использования SET NULL
+    category_id INT,
     FOREIGN KEY (account_id) REFERENCES account(id) ON DELETE CASCADE,
     FOREIGN KEY (category_id) REFERENCES category(id) ON DELETE SET NULL
 );

@@ -4,6 +4,8 @@ import com.podlive.tracker.currency.model.Currency;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Setter
 @Getter
@@ -24,5 +26,5 @@ public class Account {
     private Currency currency;
 
     @Column(name = "start_balance")
-    private String startBalance;
+    private BigDecimal startBalance;  // !!!!!! изменен тип данных
 }

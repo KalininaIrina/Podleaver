@@ -16,40 +16,40 @@ import java.util.List;
 @RequestMapping(value = "api/v1/transaction")
 @AllArgsConstructor
 public class TransactionController {
+
     private final TransactionService transactionService;
     private final TransactionMapper responseMapper;
 
     @Operation(summary = "Get all transactions")
     @GetMapping
-    public ResponseEntity<List<TransactionResponseDto>> getAll(){
+    public ResponseEntity<List<TransactionResponseDto>> getAll() {
         return ResponseEntity.ok(transactionService.getAll().stream().map(responseMapper::map).toList());
     }
 
     @Operation(summary = "Get transaction")
     @GetMapping("/{id}")
-    private ResponseEntity<TransactionResponseDto> getById(@PathVariable Integer id){
+    public ResponseEntity<TransactionResponseDto> getById(@PathVariable Integer id) {
         return ResponseEntity.ok(responseMapper.map(transactionService.getById(id)));
     }
 
     @Operation(summary = "Add transaction")
     @PostMapping
-    private ResponseEntity<TransactionResponseDto> create(@RequestBody TransactionRequestDto requestDto){
+    public ResponseEntity<TransactionResponseDto> create(@RequestBody TransactionRequestDto requestDto) {
         Transaction transaction = transactionService.create(requestDto);
         return ResponseEntity.ok(responseMapper.map(transaction));
     }
 
     @Operation(summary = "Update transaction")
     @PutMapping("/{id}")
-    private ResponseEntity<TransactionResponseDto> update(@PathVariable Integer id, @RequestBody TransactionRequestDto requestDto){
+    public ResponseEntity<TransactionResponseDto> update(@PathVariable Integer id, @RequestBody TransactionRequestDto requestDto) {
         Transaction transaction = transactionService.update(id, requestDto);
         return ResponseEntity.ok(responseMapper.map(transaction));
     }
 
     @Operation(summary = "Delete transaction")
     @DeleteMapping("/{id}")
-    private ResponseEntity<TransactionResponseDto> delete(@PathVariable Integer id){
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
         transactionService.delete(id);
         return ResponseEntity.noContent().build();
     }
-
 }
