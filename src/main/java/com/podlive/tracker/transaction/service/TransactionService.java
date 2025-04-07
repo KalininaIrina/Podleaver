@@ -106,4 +106,9 @@ public class TransactionService {
     public Transaction getById(Integer id) {
         return transactionRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
+
+    public Transaction save(Transaction transaction) {
+        return transactionRepository.save(transaction);
+    }
+
 }
