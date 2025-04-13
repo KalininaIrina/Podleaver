@@ -2,11 +2,10 @@ package com.podlive.tracker.currency.dto;
 
 import lombok.*;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
-@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CurrencyIdDto {
     private Integer id;
 }

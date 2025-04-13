@@ -1,34 +1,77 @@
 package com.podlive.tracker.currency.service;
 
-import com.podlive.tracker.common.service.CrudService;
+import com.podlive.tracker.currency.dto.CurrencyConversionRequestDto;
+import com.podlive.tracker.currency.dto.CurrencyConversionResponseDto;
 import com.podlive.tracker.currency.dto.CurrencyRequestDto;
+import com.podlive.tracker.currency.dto.CurrencyResponseDto;
+import com.podlive.tracker.currency.mapper.CurrencyMapper;
 import com.podlive.tracker.currency.model.Currency;
 import com.podlive.tracker.currency.repository.CurrencyRepository;
+import com.podlive.tracker.currency.validator.CurrencyValidator;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-@Service//указывает что класс является сервисом
-public class CurrencyService extends CrudService<Currency, Integer> { //наследуемся от CrudService получая все CRUD методы
-    private final CurrencyRepository currencyRepository;//создаем поле для репозитория, который будет работать с сущностью Currency
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.List;
+import java.util.stream.Collectors;
 
-    public CurrencyService(CurrencyRepository currencyRepository){//конструктор класса, принимает репозиторий как зависимость
-        super(currencyRepository);//передаем репозиторий в родительский класс (CrudService)
-        this.currencyRepository = currencyRepository;//Присваиваем переданный репозиторий в поле текущего класса
+@Service
+@RequiredArgsConstructor
+public class CurrencyService {
+
+    private final CurrencyRepository currencyRepository;
+    private final CurrencyMapper currencyMapper;
+    private final CurrencyValidator currencyValidator;
+
+    public List<CurrencyResponseDto> findAll() {
+        return currencyRepository.findAll()
+                .stream()
+                .map(currencyMapper::toResponseDto)
+                .collect(Collectors.toList());
     }
 
-    public Currency create(CurrencyRequestDto requestDto){//метод создания новой валюты на основе CurrencyRequestDto
-        Currency currency = Currency.builder()
-                .name(requestDto.getName())
-                .code(requestDto.getCode())
-                .build();//создаем новый объект Currency устанавливая имя и код, и в конце заканчивая построение
-        return save(currency);//вызываем метод save из CrudService, и сохраняем только что созданный объект
+    public CurrencyResponseDto create(CurrencyRequestDto dto) {
+        currencyValidator.validate(dto);
+        Currency currency = currencyMapper.toEntity(dto);
+        return currencyMapper.toResponseDto(currencyRepository.save(currency));
     }
 
-    public Currency update(Integer id, CurrencyRequestDto requestDto){//метод обновления существующих объектов Currency, принимает в себя id объекта и данные из CurrencyRequestDto
-        Currency currency = currencyRepository.findById(id).orElseThrow(EntityNotFoundException::new);//ищет объект с введенным id, если его нет - выбрасывает ошибку
-        currency.setName(requestDto.getName());//обновляет имя валюты
-        currency.setCode(requestDto.getCode());//обновляет код валюты
-        return save(currency);//вызывает метод save из CrudService и сохраняет обновленный объект Currency
+    public CurrencyResponseDto update(Integer id, CurrencyRequestDto dto) {
+        currencyValidator.validate(dto);
+        Currency currency = currencyRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Currency not found"));
+        currencyMapper.updateEntity(currency, dto);
+        return currencyMapper.toResponseDto(currencyRepository.save(currency));
     }
+
+    public CurrencyResponseDto getById(Integer id) {
+        return currencyRepository.findById(id)
+                .map(currencyMapper::toResponseDto)
+                .orElseThrow(() -> new EntityNotFoundException("Currency not found"));
+    }
+
+    public void delete(Integer id) {
+        currencyRepository.deleteById(id);
+    }
+
+    public BigDecimal convert(BigDecimal amount, String fromCode, String toCode) {
+        Currency fromCurrency = currencyRepository.findByCode(fromCode)
+                .orElseThrow(() -> new RuntimeException("Currency not found: " + fromCode));
+
+        Currency toCurrency = currencyRepository.findByCode(toCode)
+                .orElseThrow(() -> new RuntimeException("Currency not found: " + toCode));
+
+        BigDecimal fromRate = fromCurrency.getRateToBase();
+        BigDecimal toRate = toCurrency.getRateToBase();
+
+        if (fromRate.compareTo(BigDecimal.ZERO) == 0 || toRate.compareTo(BigDecimal.ZERO) == 0) {
+            throw new IllegalArgumentException("Conversion rate cannot be zero.");
+        }
+
+        return amount.multiply(fromRate).divide(toRate, 4, RoundingMode.HALF_UP);
+    }
+
 
 }
