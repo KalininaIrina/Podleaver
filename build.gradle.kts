@@ -33,6 +33,7 @@ dependencies {
 	implementation("org.apache.commons:commons-collections4:4.4")
 	implementation("mysql:mysql-connector-java:8.0.33")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
+
 }
 
 tasks.withType<Test> {

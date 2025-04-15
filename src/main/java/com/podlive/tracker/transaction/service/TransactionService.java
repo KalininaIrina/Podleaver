@@ -11,10 +11,14 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+import java.util.LinkedHashMap;
 
 @Service
 public class TransactionService {
@@ -110,5 +114,47 @@ public class TransactionService {
     public Transaction save(Transaction transaction) {
         return transactionRepository.save(transaction);
     }
+
+    public Map<String, Float> getSpendingByCategory() {
+        List<Transaction> transactions = StreamSupport
+                .stream(transactionRepository.findAll().spliterator(), false)
+                .collect(Collectors.toList());
+
+        return transactions.stream()
+                .filter(t -> t.getAmount() < 0)
+                .collect(Collectors.groupingBy(
+                        t -> t.getCategory().getName(),
+                        Collectors.summingDouble(Transaction::getAmount)
+                ))
+                .entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> e.getValue().floatValue()
+                ));
+    }
+
+
+    public Map<String, Float> getSpendingByMonth() {
+        List<Transaction> transactions = StreamSupport
+                .stream(transactionRepository.findAll().spliterator(), false)
+                .collect(Collectors.toList());
+
+        return transactions.stream()
+                .filter(t -> t.getAmount() < 0)
+                .collect(Collectors.groupingBy(
+                        t -> t.getTimestamp().getYear() + "-" + String.format("%02d", t.getTimestamp().getMonthValue()),
+                        Collectors.summingDouble(t -> t.getAmount().doubleValue())
+                ))
+                .entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> e.getValue().floatValue(),
+                        (a, b) -> b,
+                        LinkedHashMap::new
+                ));
+    }
+
+
 
 }

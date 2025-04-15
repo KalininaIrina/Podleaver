@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "api/v1/transaction")
@@ -52,4 +53,15 @@ public class TransactionController {
         transactionService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/analytics/by-category")
+    public Map<String, Float> getByCategory() {
+        return transactionService.getSpendingByCategory();
+    }
+
+    @GetMapping("/analytics/by-month")
+    public Map<String, Float> getByMonth() {
+        return transactionService.getSpendingByMonth();
+    }
+
 }
