@@ -12,6 +12,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -61,7 +62,7 @@ public class RecurringTransactionService {
         Transaction transaction = Transaction.builder()
                 .account(recurringTransaction.getAccount())
                 .category(recurringTransaction.getCategory())
-                .amount(recurringTransaction.getAmount().floatValue())
+                .amount(BigDecimal.valueOf(recurringTransaction.getAmount().floatValue()))
                 .timestamp(LocalDateTime.from(recurringTransaction.getNextExecutionDate()))
                 .build();
 

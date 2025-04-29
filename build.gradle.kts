@@ -33,6 +33,12 @@ dependencies {
 	implementation("org.apache.commons:commons-collections4:4.4")
 	implementation("mysql:mysql-connector-java:8.0.33")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
+	// Зависимости для валидации
+	implementation ("org.hibernate:hibernate-validator:6.1.6.Final")
+	implementation ("javax.validation:validation-api:2.0.1.Final")
+
+	// Если не добавлен, добавьте также поддержку аннотаций
+	implementation ("org.glassfish:javax.el:3.0.0")
 
 }
 

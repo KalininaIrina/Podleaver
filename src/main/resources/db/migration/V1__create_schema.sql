@@ -50,3 +50,12 @@ CREATE TABLE IF NOT EXISTS recurring_transaction (
     FOREIGN KEY (account_id) REFERENCES account(id) ON DELETE CASCADE,
     FOREIGN KEY (category_id) REFERENCES category(id) ON DELETE SET NULL
 );
+
+CREATE TABLE IF NOT EXISTS goal (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    target_amount DECIMAL(19,2) NOT NULL,
+    target_date DATE,
+    account_id INT NOT NULL,
+    FOREIGN KEY (account_id) REFERENCES account(id)
+);
