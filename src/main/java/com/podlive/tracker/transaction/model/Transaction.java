@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Setter
@@ -27,7 +28,10 @@ public class Transaction {
     private Float amount;
 
     @Column(name = "timestamp")
-    private LocalDate timestamp;
+    private LocalDateTime timestamp;
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")

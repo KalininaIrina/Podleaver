@@ -54,14 +54,41 @@ public class TransactionController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/analytics/by-category")
-    public Map<String, Float> getByCategory() {
+    @GetMapping("/analytics/category")
+    public Map<String, Float> getCategoryStats() {
         return transactionService.getSpendingByCategory();
     }
 
-    @GetMapping("/analytics/by-month")
-    public Map<String, Float> getByMonth() {
+    @GetMapping("/analytics/month")
+    public Map<String, Float> getMonthlyStats() {
         return transactionService.getSpendingByMonth();
     }
+
+    @GetMapping("/analytics/week")
+    public Map<String, Float> getWeeklyStats() {
+        return transactionService.getSpendingByWeek();
+    }
+
+    @GetMapping("/analytics/top-category")
+    public String getTopCategory() {
+        return transactionService.getTopSpendingCategory();
+    }
+
+    @GetMapping("/analytics/top-month")
+    public String getTopMonth() {
+        return transactionService.getTopSpendingMonth();
+    }
+
+    @GetMapping("/spending/total")
+    public Float getTotalSpending() {
+        return transactionService.getTotalSpending();
+    }
+
+    /*@Operation(summary = "Get total spending")
+    @GetMapping("/{id}")
+    public Float getTotalSpending() {
+        return transactionService.getTotalSpending();
+    }*/
+
 
 }

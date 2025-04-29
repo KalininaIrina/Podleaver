@@ -11,6 +11,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import java.util.LinkedHashMap;
+import java.time.LocalDate;
+import java.time.temporal.WeekFields;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class TransactionService {
@@ -52,7 +57,7 @@ public class TransactionService {
                 .build();
 
         // Обновление баланса счета
-        account.setStartBalance(account.getStartBalance().add(BigDecimal.valueOf(requestDto.getAmount()))); // add() работает с BigDecimal
+        account.setStartBalance(account.getStartBalance().add(BigDecimal.valueOf(requestDto.getAmount())));
         accountRepository.save(account);
 
         return transactionRepository.save(transaction);
@@ -153,6 +158,56 @@ public class TransactionService {
                         (a, b) -> b,
                         LinkedHashMap::new
                 ));
+    }
+
+    public Map<String, Float> getSpendingByWeek() {
+        List<Transaction> transactions = StreamSupport
+                .stream(transactionRepository.findAll().spliterator(), false)
+                .filter(t -> t.getAmount() < 0) // Только траты
+                .collect(Collectors.toList());
+
+        return transactions.stream()
+                .collect(Collectors.groupingBy(
+                        transaction -> {
+                            LocalDateTime date = transaction.getTimestamp();
+                            WeekFields weekFields = WeekFields.of(Locale.getDefault());
+                            int weekNumber = date.get(weekFields.weekOfYear());
+                            return "Week " + weekNumber + " (" + date.getYear() + ")";
+                        },
+                        Collectors.summingDouble(t -> t.getAmount().doubleValue())
+                ))
+                .entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> e.getValue().floatValue(),
+                        (a, b) -> b,
+                        LinkedHashMap::new
+                ));
+    }
+
+
+    public String getTopSpendingCategory() {
+        Map<String, Float> spendingByCategory = getSpendingByCategory();
+        return spendingByCategory.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse("No category found");
+    }
+
+    public String getTopSpendingMonth() {
+        Map<String, Float> spendingByMonth = getSpendingByMonth();
+        return spendingByMonth.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse("No month found");
+    }
+
+    public Float getTotalSpending() {
+        return StreamSupport.stream(transactionRepository.findAll().spliterator(), false)
+                .filter(t -> t.getAmount() < 0)
+                .map(t -> t.getAmount().floatValue())
+                .reduce(0f, Float::sum);
     }
 
 
