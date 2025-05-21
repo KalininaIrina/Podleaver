@@ -14,19 +14,19 @@ export default {
   name: 'AccountsView',
   methods: {
     async getAll() {
-      const res = await fetch('http://localhost:8000/ape/v1/account');
+      const res = await fetch('http://localhost:8080/ape/v1/account');
       const data = await res.json();
       console.log('Все аккаунты:', data);
     },
     async getById() {
       const id = 1;
-      const res = await fetch(`http://localhost:8000/ape/v1/account/${id}`);
+      const res = await fetch(`http://localhost:8080/ape/v1/account/${id}`);
       const data = await res.json();
       console.log(`Аккаунт #${id}:`, data);
     },
     async create() {
       const newData = { name: 'Новый аккаунт', balance: 1000 };
-      const res = await fetch('http://localhost:8000/ape/v1/account', {
+      const res = await fetch('http://localhost:8080/ape/v1/account', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newData)
@@ -37,7 +37,7 @@ export default {
     async update() {
       const id = 1;
       const updateData = { name: 'Обновлённый аккаунт', balance: 999 };
-      const res = await fetch(`http://localhost:8000/ape/v1/account/${id}`, {
+      const res = await fetch(`http://localhost:8080/ape/v1/account/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updateData)
@@ -47,7 +47,7 @@ export default {
     },
     async remove() {
       const id = 1;
-      const res = await fetch(`http://localhost:8000/ape/v1/account/${id}`, {
+      const res = await fetch(`http://localhost:8080/ape/v1/account/${id}`, {
         method: 'DELETE'
       });
       if (res.ok) console.log(`Удалён аккаунт #${id}`);
