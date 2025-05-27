@@ -333,6 +333,7 @@ export default {
 .category-name {
   font-weight: 500;
   font-size: 1.1em;
+  color: #333;
 }
 
 .category-type {
@@ -365,6 +366,7 @@ export default {
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  color: #666;
 }
 
 .category-form {

@@ -413,7 +413,7 @@ export default {
   display: flex;
   align-items: center;
   padding: 12px 15px;
-  background-color: white;
+  background-color: rgb(255, 255, 255);
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   cursor: pointer;
@@ -449,6 +449,7 @@ export default {
 
 .tx-category {
   font-weight: 500;
+  color: #666;
 }
 
 .tx-account {
@@ -499,6 +500,7 @@ export default {
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  color:  #666;
 }
 
 .transaction-form {
